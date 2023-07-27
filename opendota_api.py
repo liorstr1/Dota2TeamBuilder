@@ -50,33 +50,23 @@ def get_all_matches_using_ids(matches):
         match_details = response.json()
 
         # Initialize lists to store the heroes played by each team
-        radiant_team = []
-        dire_team = []
-
-        # Loop through each player in the match
-        for player in match_details['players']:
-            # If the player was on the radiant team, add their hero to the radiant team list
-            if player['isRadiant']:
-                radiant_team.append(player['hero_id'])
-            # Otherwise, add their hero to the dire team list
-            else:
-                dire_team.append(player['hero_name'])
-
-        # Determine the winner of the match
+        radiant_team = [p['hero_id'] for p in match_details['players'] if p['isRadiant']]
+        dire_team = [p['hero_id'] for p in match_details['players'] if not p['isRadiant']]
         winner = 'radiant' if match['radiant_win'] else 'dire'
 
-        # Add the formatted match to the list of formatted matches
         formatted_matches.append({
             'match_id': match['match_id'],
             'radiant_team': radiant_team,
             'dire_team': dire_team,
-            'winner': winner
+            'winner': winner,
+            'human_only': match_details['human_players'] == 10,
         })
+    return formatted_matches
 
 
 if __name__ == "__main__":
     op = OpenDotaAPI()
-    op.fill_heroes_id()
-    # all_matches_to_add = op.get_next_matches(3)
-    # get_all_matches_using_ids(all_matches_to_add)
+    # op.fill_heroes_id()
+    all_matches_to_add = op.get_next_matches(3)
+    get_all_matches_using_ids(all_matches_to_add)
 

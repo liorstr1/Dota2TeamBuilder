@@ -15,10 +15,6 @@ class TalkToDb:
             for table_name in tables:
                 cursor.execute(f"DROP TABLE IF EXISTS {table_name[0]};")
             self.conn.commit()
-            self.init_heroes_table()
-
-        if not self.check_if_database_exists():
-            self.init_heroes_table()
 
     def check_if_database_exists(self):
         if not os.path.exists(self.DB_NAME):
@@ -32,6 +28,29 @@ class TalkToDb:
 
         drop_table_query = f"DROP TABLE IF EXISTS heroes"
         cursor.execute(drop_table_query)
+
+        create_table_query = '''
+        CREATE TABLE IF NOT EXISTS heroes (
+            hero_id INTEGER PRIMARY KEY,
+            name TEXT,
+            localized_name TEXT,
+            primary_attr TEXT,
+            attack_type TEXT,
+            role TEXT
+        )
+        '''
+
+        # Execute the create table query
+        cursor.execute(create_table_query)
+
+        # Commit the changes and close the connection
+        self.conn.commit()
+
+    def init_matches_table(self):
+        cursor = self.conn.cursor()
+
+        drop_matches_query = f"DROP TABLE IF EXISTS matches"
+        cursor.execute(drop_matches_query)
 
         create_table_query = '''
         CREATE TABLE IF NOT EXISTS heroes (
@@ -69,3 +88,4 @@ class TalkToDb:
 
 if __name__ == "__main__":
     talk_db = TalkToDb(clear_db=True)
+    talk_db.init_matches_table()
